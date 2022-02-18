@@ -66,7 +66,7 @@ export function Users() {
           <TableRow>
             <TableCell>Nome Completo</TableCell>
             <TableCell align="center">Primeiro Nome</TableCell>
-            <TableCell align="center">Segundo Nome</TableCell>
+            <TableCell align="center">Ultimo Nome</TableCell>
             <TableCell align="center">Email</TableCell>
             <TableCell align="center">Delete</TableCell>
           </TableRow>
