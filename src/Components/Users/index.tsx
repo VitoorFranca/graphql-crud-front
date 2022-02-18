@@ -6,7 +6,9 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import { useQuery } from "urql";
+import { useMutation, useQuery } from "urql";
+import { IconButton } from "@material-ui/core";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 export type User = {
   _id: string;
@@ -15,6 +17,11 @@ export type User = {
   lastName: string;
   email: string;
 };
+
+const DeleteUserMutation = `
+mutation deleteUserId ($id: ID!,) {
+  deleteUser(id: $id)
+}`;
 
 const UsersQuery = `
   query {
@@ -37,14 +44,20 @@ const useStyles = makeStyles({
 export function Users() {
   const classes = useStyles();
 
-  const [result, reexecuteQuery] = useQuery({
+  const [result, reexecuteUsersQuery] = useQuery({
     query: UsersQuery,
   });
+  const [updateUserResult, deleteUser] = useMutation(DeleteUserMutation);
 
   const { data, fetching, error } = result;
 
   if (fetching) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
+
+  const handleDeleteUser = async (id: User["_id"]) => {
+    const success = await deleteUser({ id });
+    if (success) reexecuteUsersQuery();
+  };
 
   return (
     <TableContainer component={Paper}>
@@ -59,17 +72,24 @@ export function Users() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.users.map(({ fullName, firstName, lastName, email }: User) => (
-            <TableRow key={fullName}>
-              <TableCell component="th" scope="row" align="center">
-                {fullName}
-              </TableCell>
-              <TableCell align="center">{firstName}</TableCell>
-              <TableCell align="center">{lastName}</TableCell>
-              <TableCell align="center">{email}</TableCell>
-              <TableCell align="center"></TableCell>
-            </TableRow>
-          ))}
+          {data.users.map(
+            ({ fullName, firstName, lastName, email, _id }: User) => (
+              <TableRow key={fullName}>
+                <TableCell component="th" scope="row" align="center">
+                  {fullName}
+                </TableCell>
+                <TableCell align="center">{firstName}</TableCell>
+                <TableCell align="center">{lastName}</TableCell>
+                <TableCell align="center">{email}</TableCell>
+                <TableCell align="center">
+                  {" "}
+                  <IconButton onClick={() => handleDeleteUser(_id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            )
+          )}
         </TableBody>
       </Table>
     </TableContainer>
