@@ -17,7 +17,7 @@
 
 <br>
 
-> # Installations
+> # Installation
 
 ## FrontEnd
 
